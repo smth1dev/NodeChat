@@ -1,0 +1,73 @@
+<!doctype html>
+<head>
+<style type="text/css">
+#messages{
+  width:90%;
+  margin:0 auto;
+
+}
+.bubble{
+    margin:5px;
+    padding-left:20px;
+    padding-right:20px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    word-wrap: break-word;
+    border:1px solid blue;
+    border-radius:10px;
+  }
+  </style>
+  
+</head>
+<html>
+
+
+<body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+ <script src="/../socket.io/socket.io.js"></script>
+  <script>
+   var socket = io();
+   var privateChatUser = localStorage.getItem("privateChatUser")
+  if(privateChatUser == "")
+    window.location = "http://localhost:3000/chatrooms";
+
+  
+  socket.emit('getIds',privateChatUser);
+
+  socket.on('getId',function(){
+
+  })
+
+   socket.on('private chat message', function(msg){
+    $('#messages').append($('<div class="bubble">').text(msg));
+   });
+   socket.on('onlineUsers', function(msg){
+    $('#whoIsOnline').text("");
+    for(var i=0;i<msg.length;i++){
+      $('#whoIsOnline').append('<div onclick="startPrivateChat()" class="friendButton">'+msg[i]+'<div>');
+    }
+    
+   });
+
+  function sendMessage(){
+    socket.emit('chat message',{message:$("#messageBox").val(),private:privateChatUser});
+   }
+   function startPrivateChat(){
+      // Storing the data:
+      localStorage.setItem("privateChatUser","");
+      window.location = "http://localhost:3000/private";
+   }
+
+</script>
+<script src="homeController.js"></script>
+Chat welcome
+<div id="messages"></div>
+
+<input id="messageBox" type="text" />
+<button id="sendButton" onclick="sendMessage()">Send</button>
+<h4>Online Now</h4>
+<div id="whoIsOnline">
+</div>
+</body>
+
+</html>
